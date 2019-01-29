@@ -1,0 +1,16 @@
+#cloud-config
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - curl
+  - git
+  - zsh
+
+runcmd:
+# install Oh My ZSH
+  - 'git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh.git /root/.oh-my-zsh'
+  - 'cp /root/.oh-my-zsh/templates/zshrc.zsh-template /root/.zshrc'
+  - 'sed -i "s/ZSH_THEME=\".*\"/ZSH_THEME=\"ys\"/" /root/.zshrc'
+  - 'chsh -s /usr/bin/zsh'
