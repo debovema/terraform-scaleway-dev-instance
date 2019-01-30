@@ -13,10 +13,16 @@ resource "scaleway_server" "node" {
   image               = "${data.scaleway_image.image.id}"
   type                = "${var.server_type}"
   dynamic_ip_required = true
+  boot_type           = "local"
 }
 
 data "template_file" "userdata" {
   template = "${file("${path.module}/cloud-init-user-data")}"
+
+  vars {
+    distrib  = "${var.docker_distrib}"
+    codename = "${var.docker_distrib_codename}"
+  }
 }
 
 resource "scaleway_user_data" "ud" {

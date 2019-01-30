@@ -22,3 +22,13 @@ variable "server_type" {
   type    = "string"
   default = "START1-S"
 }
+
+variable "docker_distrib" {
+  type    = "string"
+  default = "ubuntu"
+}
+
+variable "docker_distrib_codename" {
+  type    = "string"
+  default = "bionic"
+}

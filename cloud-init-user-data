@@ -5,8 +5,16 @@ package_upgrade: true
 
 packages:
   - curl
+  - docker-ce
   - git
   - zsh
+
+apt:
+  preserve_sources_list: true
+  sources:
+    docker.list:
+      source: "deb [arch=amd64] https://download.docker.com/linux/${distrib} ${codename} stable"
+      keyid: 0EBFCD88
 
 runcmd:
 # install Oh My ZSH
@@ -14,3 +22,9 @@ runcmd:
   - 'cp /root/.oh-my-zsh/templates/zshrc.zsh-template /root/.zshrc'
   - 'sed -i "s/ZSH_THEME=\".*\"/ZSH_THEME=\"ys\"/" /root/.zshrc'
   - 'chsh -s /usr/bin/zsh'
+
+power_state:
+  delay: "now"
+  mode: reboot
+  message: Reboot after system upgrade
+  condition: True
