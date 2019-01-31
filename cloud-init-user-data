@@ -1,5 +1,19 @@
 #cloud-config
 
+# users and groups
+#groups:
+#  - docker
+
+users:
+  - default
+  - name: ${user}
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/zsh
+    groups: docker
+
+disable_root: true
+
+# packages
 package_update: true
 package_upgrade: true
 
@@ -7,6 +21,7 @@ packages:
   - curl
   - docker-ce
   - git
+  - sudo
   - zsh
 
 apt:
@@ -17,14 +32,23 @@ apt:
       keyid: 0EBFCD88
 
 runcmd:
-# install Oh My ZSH
+# copy authorized SSH keys for the created user
+  - 'mkdir -p /home/${user}/.ssh'
+  - 'cp /root/.ssh/authorized_keys /home/${user}/.ssh/authorized_keys'
+  - 'chown ${user}:root /home/${user}/.ssh/authorized_keys'
+# install Oh My ZSH for root
   - 'git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh.git /root/.oh-my-zsh'
   - 'cp /root/.oh-my-zsh/templates/zshrc.zsh-template /root/.zshrc'
   - 'sed -i "s/ZSH_THEME=\".*\"/ZSH_THEME=\"ys\"/" /root/.zshrc'
   - 'chsh -s /usr/bin/zsh'
+# install Oh My ZSH for user
+  - 'runuser -l ${user} -c "git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh.git /home/${user}/.oh-my-zsh"'
+  - 'runuser -l ${user} -c "cp /home/${user}/.oh-my-zsh/templates/zshrc.zsh-template /home/${user}/.zshrc"'
+  - 'sed -i "s/ZSH_THEME=\".*\"/ZSH_THEME=\"ys\"/" /home/${user}/.zshrc'
 
 power_state:
-  delay: "now"
+  delay: "+1"
+  timeout: 0
   mode: reboot
   message: Reboot after system upgrade
   condition: True

@@ -14,20 +14,41 @@ resource "scaleway_server" "node" {
   type                = "${var.server_type}"
   dynamic_ip_required = true
   boot_type           = "local"
+
+  # initialization sequence
+  cloudinit           = "${data.template_file.userdata.rendered}"
+  provisioner "remote-exec" {
+    inline = ["while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'waiting for cloud-init initialization'; sleep 10; done;"]
+  }
+  provisioner "local-exec" {
+    command = "sleep 80" # wait more than 1 minute for the instance to be rebooted
+  }
+
 }
 
 data "template_file" "userdata" {
   template = "${file("${path.module}/cloud-init-user-data")}"
 
   vars {
-    distrib  = "${var.docker_distrib}"
     codename = "${var.docker_distrib_codename}"
+    distrib  = "${var.docker_distrib}"
+    user     = "${var.username}"
   }
 }
 
-resource "scaleway_user_data" "ud" {
-  count  = "${var.node_count}"
-  server = "${element(scaleway_server.node.*.id, count.index)}"
-  key    = "cloud-init"
-  value  = "${data.template_file.userdata.rendered}"
+resource "null_resource" "node" {
+  count = "${var.node_count}"
+
+  connection {
+    host = "${element(scaleway_server.node.*.public_ip, count.index)}"
+    user = "${var.username}"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "mkdir -p ~/www",
+      "echo 'It works' > ~/www/index.html",
+      "docker run --name http-nginx --restart=always -v ~/www:/usr/share/nginx/html:ro -p 80:80 -d nginx"
+    ]
+  }
 }

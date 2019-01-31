@@ -23,6 +23,11 @@ variable "server_type" {
   default = "START1-S"
 }
 
+variable "username" {
+  type    = "string"
+  default = "user"
+}
+
 variable "docker_distrib" {
   type    = "string"
   default = "ubuntu"
