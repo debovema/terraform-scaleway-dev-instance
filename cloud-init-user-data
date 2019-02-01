@@ -1,9 +1,6 @@
 #cloud-config
 
-# users and groups
-#groups:
-#  - docker
-
+# users
 users:
   - default
   - name: ${user}
@@ -11,25 +8,15 @@ users:
     shell: /bin/zsh
     groups: docker
 
-disable_root: true
-
 # packages
 package_update: true
 package_upgrade: true
 
 packages:
   - curl
-  - docker-ce
   - git
   - sudo
   - zsh
-
-apt:
-  preserve_sources_list: true
-  sources:
-    docker.list:
-      source: "deb [arch=amd64] https://download.docker.com/linux/${distrib} ${codename} stable"
-      keyid: 0EBFCD88
 
 runcmd:
 # copy authorized SSH keys for the created user
@@ -45,7 +32,16 @@ runcmd:
   - 'runuser -l ${user} -c "git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh.git /home/${user}/.oh-my-zsh"'
   - 'runuser -l ${user} -c "cp /home/${user}/.oh-my-zsh/templates/zshrc.zsh-template /home/${user}/.zshrc"'
   - 'sed -i "s/ZSH_THEME=\".*\"/ZSH_THEME=\"ys\"/" /home/${user}/.zshrc'
+# install Docker
+  - 'add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/${distrib} $(lsb_release -cs) stable"'
+  - 'apt-get update'
+  - 'apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common'
+  - 'curl -fsSL https://download.docker.com/linux/${distrib}/gpg > /tmp/docker.gpg'
+  - 'apt-key add /tmp/docker.gpg'
+  - 'apt-get update'
+  - 'apt-get install -y docker-ce'
 
+#
 power_state:
   delay: "+1"
   timeout: 0

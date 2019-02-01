@@ -18,7 +18,10 @@ resource "scaleway_server" "node" {
   # initialization sequence
   cloudinit           = "${data.template_file.userdata.rendered}"
   provisioner "remote-exec" {
-    inline = ["while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'waiting for cloud-init initialization'; sleep 10; done;"]
+    inline = [
+      "tail -f /var/log/cloud-init-output.log &",
+      "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do sleep 10; done;"
+    ]
   }
   provisioner "local-exec" {
     command = "sleep 80" # wait more than 1 minute for the instance to be rebooted
