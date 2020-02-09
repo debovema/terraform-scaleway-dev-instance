@@ -1,4 +1,4 @@
 output "public_ips" {
-  value = "${scaleway_server.node.*.public_ip}"
+  value = scaleway_instance_server.node.*.public_ip
 }
 
