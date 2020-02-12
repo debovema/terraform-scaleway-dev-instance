@@ -1,9 +1,5 @@
 provider "scaleway" {
-  #access_key      = "<SCALEWAY-ACCESS-KEY>"
-  #secret_key      = "<SCALEWAY-SECRET-KEY>"
-  #organization_id = "<SCALEWAY-ORGANIZATION-ID>"
-  zone            = "fr-par-1"
-  region          = "fr-par"
+  # Provide configuration with environment variables, see https://www.terraform.io/docs/providers/scaleway/index.html#environment-variables
 }
 
 data "scaleway_image" "image" {
@@ -11,6 +7,16 @@ data "scaleway_image" "image" {
 
   architecture = var.server_arch
   name         = var.server_image
+}
+
+data "template_file" "userdata" {
+  template = file("${path.module}/cloud-init-user-data")
+
+  vars = {
+    codename = var.docker_distrib_codename
+    distrib  = var.docker_distrib
+    user     = var.username
+  }
 }
 
 resource "scaleway_instance_server" "node" {
@@ -21,7 +27,6 @@ resource "scaleway_instance_server" "node" {
   image               = data.scaleway_image.image[0].id
   type                = var.server_type
   enable_dynamic_ip   = true
-  # boot_type           = "local"
 
   # initialization sequence
   cloud_init = data.template_file.userdata.rendered
@@ -29,7 +34,7 @@ resource "scaleway_instance_server" "node" {
   connection {
     host = element(scaleway_instance_server.node.*.public_ip, count.index)
     user = var.username
-    private_key = file("~/.ssh/scaleway")
+    private_key = file(var.ssh_key_file)
   }
 
   provisioner "remote-exec" {
@@ -43,23 +48,13 @@ resource "scaleway_instance_server" "node" {
   }
 }
 
-data "template_file" "userdata" {
-  template = file("${path.module}/cloud-init-user-data")
-
-  vars = {
-    codename = var.docker_distrib_codename
-    distrib  = var.docker_distrib
-    user     = var.username
-  }
-}
-
 resource "null_resource" "node" {
   count = var.node_count
 
   connection {
     host = element(scaleway_instance_server.node.*.public_ip, count.index)
     user = var.username
-    private_key = file("~/.ssh/scaleway")
+    private_key = file(var.ssh_key_file)
   }
 
   provisioner "remote-exec" {

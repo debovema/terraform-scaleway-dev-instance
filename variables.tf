@@ -23,6 +23,11 @@ variable "server_type" {
   default = "START1-S"
 }
 
+variable "ssh_key_file" {
+  type    = string
+  default = "~/.ssh/scaleway"
+}
+
 variable "username" {
   type    = string
   default = "user"
