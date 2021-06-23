@@ -2,18 +2,10 @@ provider "scaleway" {
   # Provide configuration with environment variables, see https://www.terraform.io/docs/providers/scaleway/index.html#environment-variables
 }
 
-data "scaleway_image" "image" {
-  count = var.node_count > 0 ? 1 : 0
-
-  architecture = var.server_arch
-  name         = var.server_image
-}
-
 data "template_file" "userdata" {
   template = file("${path.module}/cloud-init-user-data")
 
   vars = {
-    codename = var.docker_distrib_codename
     distrib  = var.docker_distrib
     user     = var.username
   }
@@ -24,7 +16,7 @@ resource "scaleway_instance_server" "node" {
 
   name = "${var.node_name}-${count.index}"
 
-  image               = data.scaleway_image.image[0].id
+  image               = var.server_image
   type                = var.server_type
   enable_dynamic_ip   = true
 

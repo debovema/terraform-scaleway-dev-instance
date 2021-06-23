@@ -8,19 +8,14 @@ variable "node_name" {
   default = "cloud-init"
 }
 
-variable "server_arch" {
-  type    = string
-  default = "x86_64"
-}
-
 variable "server_image" {
   type    = string
-  default = "Ubuntu Bionic"
+  default = "ubuntu_focal"
 }
 
 variable "server_type" {
   type    = string
-  default = "START1-S"
+  default = "DEV1-S"
 }
 
 variable "ssh_key_file" {
@@ -37,9 +32,3 @@ variable "docker_distrib" {
   type    = string
   default = "ubuntu"
 }
-
-variable "docker_distrib_codename" {
-  type    = string
-  default = "bionic"
-}
-

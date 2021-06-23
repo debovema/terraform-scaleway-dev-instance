@@ -8,12 +8,14 @@
 ssh-keygen -t rsa -b 4096 -q -C 'scaleway' -N '' -f ~/.ssh/scaleway
 ```
 
-2. [Retrieve your organization and API token](https://console.scaleway.com/account/credentials) and export them:
+2. [Retrieve your project credentials](https://console.scaleway.com/project/credentials) and export them:
 
 ```
+export SCW_DEFAULT_PROJECT_ID=<REDACTED>
 export SCW_ACCESS_KEY=<REDACTED>
 export SCW_SECRET_KEY=<REDACTED>
-export SCW_DEFAULT_ORGANIZATION_ID=<REDACTED>
+export SCW_DEFAULT_REGION=fr-par
+export SCW_DEFAULT_ZONE=fr-par-1
 ```
 
 3. Initialize Terraform
