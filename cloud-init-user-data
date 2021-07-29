@@ -2,7 +2,6 @@
 
 # users
 users:
-  - default
   - name: ${user}
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/zsh
@@ -14,8 +13,11 @@ package_upgrade: true
 
 packages:
   - curl
+  - jq
   - git
   - sudo
+  - unzip
+  - zip
   - zsh
 
 runcmd:
@@ -23,6 +25,7 @@ runcmd:
   - 'mkdir -p /home/${user}/.ssh'
   - 'cp /root/.ssh/authorized_keys /home/${user}/.ssh/authorized_keys'
   - 'chown ${user}:root /home/${user}/.ssh/authorized_keys'
+%{if feature_omz ~}
 # install Oh My ZSH for root
   - 'git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh.git /root/.oh-my-zsh'
   - 'cp /root/.oh-my-zsh/templates/zshrc.zsh-template /root/.zshrc'
@@ -32,15 +35,35 @@ runcmd:
   - 'runuser -l ${user} -c "git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh.git /home/${user}/.oh-my-zsh"'
   - 'runuser -l ${user} -c "cp /home/${user}/.oh-my-zsh/templates/zshrc.zsh-template /home/${user}/.zshrc"'
   - 'sed -i "s/ZSH_THEME=\".*\"/ZSH_THEME=\"ys\"/" /home/${user}/.zshrc'
+%{endif~}
+%{if feature_docker ~}
 # install Docker
-  - 'add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/${distrib} $(lsb_release -cs) stable"'
   - 'apt-get update'
-  - 'apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common'
-  - 'curl -fsSL https://download.docker.com/linux/${distrib}/gpg > /tmp/docker.gpg'
-  - 'apt-key add /tmp/docker.gpg'
+  - 'apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release'
+  - 'curl -fsSL https://download.docker.com/linux/${distrib}/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg'
+  - 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/${distrib} $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null'
   - 'apt-get update'
-  - 'apt-get install -y docker-ce'
-
+  - 'apt-get install -y docker-ce docker-ce-cli containerd.io'
+%{endif~}
+%{if feature_nvm ~}
+# install NVM
+  - 'runuser -l ${user} -c "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$(curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest | jq -r .tag_name)/install.sh | bash"'
+  - 'runuser -l ${user} -c "touch /home/${user}/.zshrc"'
+  - |
+    cat << 'EOF' >> /home/${user}/.zshrc
+    export NVM_DIR="$([ -z "$${XDG_CONFIG_HOME-}" ] && printf %s "$${HOME}/.nvm" || printf %s "$${XDG_CONFIG_HOME}/nvm")"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+    EOF
+%{endif~}
+%{if feature_sdkman ~}
+# install SDKMAN!
+  - 'runuser -l ${user} -c "curl -s "https://get.sdkman.io" | bash"'
+  - 'runuser -l ${user} -c "touch /home/${user}/.zshrc"'
+  - |
+    cat << 'EOF' >> /home/${user}/.zshrc
+    source "$HOME/.sdkman/bin/sdkman-init.sh"
+    EOF
+%{endif~}
 #
 power_state:
   delay: "+1"
