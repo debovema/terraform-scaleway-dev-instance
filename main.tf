@@ -1,7 +1,3 @@
-provider "scaleway" {
-  # Provide configuration with environment variables, see https://www.terraform.io/docs/providers/scaleway/index.html#environment-variables
-}
-
 data "template_file" "userdata" {
   template = file("${path.module}/cloud-init-user-data")
 
