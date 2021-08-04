@@ -49,21 +49,3 @@ resource "null_resource" "wait_for_init" {
     command = "sleep 80" # wait more than 1 minute for the instance to be rebooted
   }
 }
-
-resource "null_resource" "docker_test" {
-  count = var.feature_docker && var.feature_docker_test ? var.node_count : 0
-
-  provisioner "remote-exec" {
-    connection {
-      host        = element(scaleway_instance_server.node.*.public_ip, count.index)
-      user        = var.username
-      private_key = file(var.ssh_key_file)
-    }
-
-    inline = [
-      "mkdir -p ~/www",
-      "echo 'It works' > ~/www/index.html",
-      "docker run --name http-nginx --restart=always -v ~/www:/usr/share/nginx/html:ro -p 80:80 -d nginx",
-    ]
-  }
-}
