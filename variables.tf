@@ -48,12 +48,6 @@ variable "feature_docker" {
   default     = false
 }
 
-variable "feature_docker_test" {
-  type        = bool
-  description = "Whether to deploy a Docker test container when Docker feature is enabled (otherwise it will be ignored)"
-  default     = true
-}
-
 variable "feature_nvm" {
   type        = bool
   description = "Whether to install NVM or not"
