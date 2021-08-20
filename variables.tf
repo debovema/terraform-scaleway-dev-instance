@@ -42,6 +42,12 @@ variable "feature_omz" {
   default     = false
 }
 
+variable "feature_k3s" {
+  type        = bool
+  description = "Whether to install K3S or not"
+  default     = false
+}
+
 variable "feature_docker" {
   type        = bool
   description = "Whether to install Docker or not"

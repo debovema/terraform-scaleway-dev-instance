@@ -55,7 +55,8 @@ provider "registry.terraform.io/hashicorp/template" {
 }
 
 provider "registry.terraform.io/scaleway/scaleway" {
-  version = "2.1.0"
+  version     = "2.1.0"
+  constraints = "~> 2.0"
   hashes = [
     "h1:IfyjOGvS3B9fsA1s4XSr0ajVlufSMq/bbqAX8DODdcY=",
     "zh:0de647cba4e5a5973984a0e223aa5b6dc06022a0ed9ddc491d4cc1543d4516f0",

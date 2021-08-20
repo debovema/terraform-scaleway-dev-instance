@@ -7,6 +7,7 @@ This Terraform module can be used to create cheap and disposable development mac
 ## Examples
 
 * [Full-featured development instance on a Scaleway DEV1-S instance running Ubuntu 20.04](examples/ubuntu_dev1-s_full)
+* [k3s cluster on 3 Scaleway DEV1-S instances running Debian Buster](examples/debian_dev1-s_k3s)
 
 ## Prerequisites
 

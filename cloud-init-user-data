@@ -45,6 +45,10 @@ runcmd:
   - 'apt-get update'
   - 'apt-get install -y docker-ce docker-ce-cli containerd.io'
 %{endif~}
+%{if feature_k3s ~}
+# install K3S
+  - 'curl -sfL https://get.k3s.io | sh -s %{if node_index == "0" ~}server --tls-san ${public_ip} %{else~}agent --server https://${first_public_ip}:6443 %{endif~} --token ${k3s_token}'
+%{endif~}
 %{if feature_nvm ~}
 # install NVM
   - 'runuser -l ${user} -c "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$(curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest | jq -r .tag_name)/install.sh | bash"'
