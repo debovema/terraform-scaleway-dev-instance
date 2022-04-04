@@ -28,7 +28,7 @@ set_tfvar() { ( [ $(grep "$1" terraform.tfvars 2>/dev/null | wc -l) -gt 0 ] && s
 2. Create your SSH key pair and [add the public key in authorized keys of your Scleway project in the Scaleway console](https://console.scaleway.com/project/credentials)
 
 ```
-ssh-keygen -t rsa -b 4096 -q -C 'scaleway' -N '' -f ~/.ssh/scaleway
+ssh-keygen -t ed25519 -q -C 'scaleway' -N '' -f ~/.ssh/scaleway
 ```
 
 > if using an existing SSH key, it is assumed its name is *~/.ssh/scaleway*
