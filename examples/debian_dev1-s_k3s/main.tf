@@ -7,18 +7,16 @@ variable "dev_username" { default = "developer" }
 // Modules
 module "dev" {
   source  = "app.terraform.io/scwdev/dev/scaleway"
-  version = "0.0.2"
+  version = "0.0.3"
 
-  server_image = "ubuntu_focal"
+  node_count   = 3
+  server_image = "debian_buster"
   server_type  = "DEV1-S"
 
+  feature_k3s  = "true"
+  feature_omz  = "true"
   ssh_key_file = var.dev_ssh_key_file
-  username = var.dev_username
-
-  feature_docker = "true"
-  feature_nvm = "true"
-  feature_omz = "true"
-  feature_sdkman = "true"
+  username     = var.dev_username
 }
 
 //--------------------------------------------------------------------
